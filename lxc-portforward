@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# WARNING: No LXC CALLS ALLOWED IN THIS SCRIPT.  THEY WILL DEADLOCK
+
+# ARGS: container net up|down ...
+
+if [ "$2" = "net" -a "$3" = "up" ]
+then
+  at -M now 2>/dev/null <<UPSCRIPT
+sleep 30;
+/etc/lxc/lxc-portforward-helper up $1
+UPSCRIPT
+else
+  at -M now 2>/dev/null <<DOWNSCRIPT
+sleep 30;
+/etc/lxc/lxc-portforward-helper down $1
+DOWNSCRIPT
+fi

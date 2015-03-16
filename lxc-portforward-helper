@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# ARGS: up|down container
+
+CONTAINER="$2"
+if [ "$1" = "up" ]
+then
+  ACTION="-A"
+  IP="$(lxc-info -i -n "$CONTAINER" | awk '{print $2}')"
+  mkdir -p /var/run/lxc-portforward
+  echo "$IP" > "/var/run/lxc-portforward/$CONTAINER"
+else
+  ACTION="-D"
+  IP="$(cat "/var/run/lxc-portforward/$CONTAINER")"
+fi
+
+for line in $(grep "^$2:" /etc/lxc/lxc-portforward.conf)
+do
+  FROM="$(echo $line | cut -f2 -d:)"
+  TO="$(echo $line | cut -f3 -d:)"
+  iptables -t nat $ACTION PREROUTING -p tcp -i eth0 --dport "$FROM" -j DNAT --to-destination "$IP:$TO"
+done
+
