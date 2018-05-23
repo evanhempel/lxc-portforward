@@ -19,7 +19,8 @@ for line in $(grep "^$2:" /etc/lxc/lxc-portforward.conf)
 do
   FROM="$(echo $line | cut -f2 -d:)"
   TO="$(echo $line | cut -f3 -d:)"
-  iptables -t nat $ACTION PREROUTING -p tcp -i eth0 --dport "$FROM" -j DNAT --to-destination "$IP:$TO"; retVal=$?
-  logger -t "`basename $0`" -p daemon.info "iptables -t nat $ACTION PREROUTING -p tcp -i eth0 --dport \"$FROM\" -j DNAT --to-destination \"$IP:$TO\": $retVal"
+  PROTO="$(echo $line | cut -f4 -d:)"
+  iptables -t nat $ACTION PREROUTING -p ${PROTO:-tcp} -i bond0 --dport "$FROM" -j DNAT --to-destination "$IP:$TO"; retVal=$?
+  logger -t "`basename $0`" -p daemon.info "iptables -t nat $ACTION PREROUTING -p ${PROTO:-tcp} -i eth0 --dport \"$FROM\" -j DNAT --to-destination \"$IP:$TO\": $retVal"
 done
 

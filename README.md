@@ -18,7 +18,9 @@ FILES:
 
 Port forwarding information is stored in /etc/lxc/lxc-portforward.conf.  Format is:
 
-    container_name:local_port:remote_port
+    container_name:local_port:remote_port[:protocol]
+
+protocol defaults to tcp
 
 IP addresses are stored in /var/run/lxc-portforward/<container name> so when
 the container is stopped the proper iptables rules can be removed.
